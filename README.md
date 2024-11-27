@@ -8,7 +8,7 @@
 
 ##URL
 
-### GET 
+### GET REQUESTS
 
 -- to get all the Books -  /api/v1/books
 
@@ -21,11 +21,11 @@
 -- to get all the books that user have returned - /api/v1/book/returned
 
 
-##POST
+## POST REQUESTS
 
 -- to save the book -  - /api/v1/books
 
-##PATCH
+## PATCH REQUESTS
 
 -- to borrow the book - /api/v1//books/borrow/{book-id}
 

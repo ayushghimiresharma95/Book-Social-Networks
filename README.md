@@ -55,3 +55,9 @@
 -- use spring security for backend authentications 
 -- Integrate JWT for secure token authentication between spring and react.
 
+
+## Class Diagram
+
+![screenshot](class-diagram.png)
+
+

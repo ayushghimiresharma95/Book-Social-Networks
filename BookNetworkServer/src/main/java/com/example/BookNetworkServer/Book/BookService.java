@@ -154,4 +154,66 @@ public class BookService {
         return book.getId();
 
     }
+    public Integer updateArchivedstatus(Integer bookId,Authentication connectedUser){
+        Book book = bookRepositary.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No Book with this ID Found.")) ;
+        User user = ((User) connectedUser.getPrincipal()) ;
+
+        if(!Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
+            throw new SecurityException("You are not allowed to update this book.") ;
+           
+        }
+
+        book.setArchived(!book.getShareable());
+        bookRepositary.save(book) ;
+
+        return book.getId();
+
+    }
+    public Integer borrowBook(Integer bookId,Authentication connectedUser){
+        Book book = bookRepositary.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No Book with this ID Found.")) ;
+        User user = ((User) connectedUser.getPrincipal()) ;
+        if(book.getArchived() || !book.getShareable()) {
+            throw new SecurityException("You are not allowed to borrow this book.") ;
+        }
+        if(Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
+            throw new SecurityException("You cannot borrow book for your own.") ;
+           
+        }
+
+        final boolean isAlreadyBorrowed = history.isAlreadyBorrowed(bookId) ;
+        if (isAlreadyBorrowed) {
+            throw new SecurityException("Somebody has borrowed this book already.") ;
+        }
+
+        BookTransactionHistory bookTransactionHistory = BookTransactionHistory.builder()
+                .user(user)
+                .book(book)
+                .returned(false)
+                .returnedApproved(false)
+                .build() ;
+        history.save(bookTransactionHistory) ;
+        return bookTransactionHistory.getId() ;       
+
+        
+
+    }
+    public Integer returnBook(Integer bookId,Authentication connectedUser){
+
+       Book book = bookRepositary.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No Book with this ID Found.")) ;
+       User user = ((User) connectedUser.getPrincipal()) ;
+
+       if(book.getArchived() || !book.getShareable()) {
+        throw new SecurityException("You are not allowed to borrow this book.") ;
+        }
+        if(Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
+            throw new SecurityException("You cannot borrow book for your own.") ;
+        }
+
+        BookTransactionHistory bookTransactionHistory = history.findByBookIdAndUserId(bookId, connectedUser.getName())
+        .orElseThrow(() -> new OperationNotPermittedException("You did not borrow this book"));
+
+        
+
+    }
+
 }

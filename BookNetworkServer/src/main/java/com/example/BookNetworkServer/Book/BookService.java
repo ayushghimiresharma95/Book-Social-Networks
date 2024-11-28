@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.BookNetworkServer.Common.PageResponse;
 import com.example.BookNetworkServer.History.BookTransactionHistory;
@@ -25,10 +26,12 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import static  com.example.BookNetworkServer.Book.BookSpecification.withOwnerId;;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BookService {
     private final BookRepositary bookRepositary ;
     private final BookMapper bookMapper ;
@@ -46,10 +49,17 @@ public class BookService {
 
     }
 
-    public BookResponse findBookID(Integer bookID){
-        return bookRepositary.findById(bookID).
-                map(bookMapper::toBookResponse).orElseThrow(() -> new EntityNotFoundException("No Book with this ID Found.")) ;
+    public BookResponse findBookID(Integer bookID) {
+        // Attempt to fetch the book from the repository
+        return bookRepositary.findById(bookID)
+                .map(bookMapper::toBookResponse)
+                .orElseThrow(() -> {
+                    // Log the exception for debugging purposes
+                    log.error("Book with ID {} not found.", bookID);
+                    return new EntityNotFoundException("No Book with this ID Found.");
+                });
     }
+    
 
 /*************  ✨ Codeium Command ⭐  *************/
 /**
@@ -87,7 +97,7 @@ public class BookService {
     public PageResponse<BookResponse> findAllBooksByOwner(int page,int size, Authentication connectedUser){
         User user = ((User) connectedUser.getPrincipal()) ;
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
-        Page<Book> books = bookRepositary.findAll(pageable) ;
+        Page<Book> books = bookRepositary.findAll(withOwnerId(connectedUser.getName()),pageable) ;
         List<BookResponse> booksResponse = books.stream()
                 .map(bookMapper::toBookResponse)
                 .toList();
@@ -159,7 +169,7 @@ public class BookService {
         User user = ((User) connectedUser.getPrincipal()) ;
 
         if(!Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
-            throw new SecurityException("You are not allowed to update this book.") ;
+            throw new SecurityException("You are not allowed to archived this book.") ;
            
         }
 
@@ -203,17 +213,53 @@ public class BookService {
        User user = ((User) connectedUser.getPrincipal()) ;
 
        if(book.getArchived() || !book.getShareable()) {
-        throw new SecurityException("You are not allowed to borrow this book.") ;
-        }
+        throw new SecurityException("this book is unshareable and is archived") ;
+    }
         if(Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
             throw new SecurityException("You cannot borrow book for your own.") ;
+    }
+
+        BookTransactionHistory bookTransactionHistory = history.findByBookIdAndUserId(bookId, user.getId())
+        .orElseThrow(() -> new SecurityException("You did not borrow this book"));
+
+
+        if(bookTransactionHistory == null) {
+            throw new SecurityException("You have not borrowed this book.") ;
         }
+        
 
-        BookTransactionHistory bookTransactionHistory = history.findByBookIdAndUserId(bookId, connectedUser.getName())
-        .orElseThrow(() -> new OperationNotPermittedException("You did not borrow this book"));
-
+        bookTransactionHistory.setReturned(true) ;
+        return bookTransactionHistory.getId() ;
         
 
     }
+    public Integer returnAndApprovedBook(Integer bookId,Authentication connectedUser){
+
+        Book book = bookRepositary.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No Book with this ID Found.")) ;
+        User user = ((User) connectedUser.getPrincipal()) ;
+ 
+        if(book.getArchived() || !book.getShareable()) {
+         throw new SecurityException("You are not allowed to borrow this book.") ;
+     }
+         if(!Objects.equals(book.getCreatedBy(), connectedUser.getName())) {
+             throw new SecurityException("You cannot borrow book for your own.") ;
+     }
+ 
+         BookTransactionHistory bookTransactionHistory = history.findByBookIdAndOwnerId(bookId, user.getId())
+         .orElseThrow(() -> new SecurityException("You did not borrow this book"));
+ 
+ 
+         if(bookTransactionHistory == null) {
+             throw new SecurityException("This is not returned yet. You can not approve its return.") ;
+         }
+         
+ 
+         bookTransactionHistory.setReturnedApproved(true) ;
+         return bookTransactionHistory.getId() ;
+         
+ 
+     }
+
+
 
 }

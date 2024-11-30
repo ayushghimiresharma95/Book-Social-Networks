@@ -6,19 +6,27 @@
 -- Implement CRUD(create,read , update and delete) operation for both frontend and backend.
 -- Users can archieve books they no longer want to share but want to keep records on.
 
+## Docker compose
+-- we have create a docker-compose file for the maildev and for the postgressql
+  docker-compose up -d 
+And for the maildev we go to the 127.0.0.1:1025 
+
+
+
+
 ### URL
 
 #### GET REQUESTS
 
--- to get all the Books -  /api/v1/books
+-- to get all the Books -  #### /api/v1/books
 
--- to get all the owner books or the user books - /api/v1/books/owner
+-- to get all the owner books or the user books - #### /api/v1/books/owner
 
--- to checout a particular book - /api/v1/Books/{book-id}
+-- to checout a particular book - #### /api/v1/Books/{book-id}
 
--- to get all the books that the user have borrowed - /api/v1/books/borrowed 
+-- to get all the books that the user have borrowed - #### /api/v1/books/borrowed 
 
--- to get all the books that user have returned - /api/v1/book/returned
+-- to get all the books that user have returned - #### /api/v1/book/returned
 
 
 #### POST REQUESTS

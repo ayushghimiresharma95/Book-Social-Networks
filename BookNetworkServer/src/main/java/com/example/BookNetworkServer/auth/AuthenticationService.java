@@ -13,8 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
 
-import com.example.BookNetworkServer.Email.EmailService;
-import com.example.BookNetworkServer.Email.EmailTemplateName;
+
 import com.example.BookNetworkServer.Role.RoleRepositary;
 import com.example.BookNetworkServer.Security.JwtService;
 import com.example.BookNetworkServer.User.Token;
@@ -35,16 +34,15 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager ;
     private final RoleRepositary roleRepository ;
     private final TokenRepositary tokenRepositary ;
-    private final EmailService emailservice ;
+
     private final JwtService jwtService ;
    
 
 
-    @Value("${application.mailing.frontend.activation-url}")
-    private String activationUrl;
+    
     
 
-    public void register(RegistrationRequest request) throws MessagingException {
+    public String register(RegistrationRequest request) throws MessagingException {
         var userRole = roleRepository.findByName("USER").orElseThrow(() -> new IllegalTransactionStateException("ROLE USEr was not found ")) ;
         var user  = User.builder().
                     firstname(request.getFirstname()).
@@ -52,15 +50,12 @@ public class AuthenticationService {
                     email(request.getEmail()).enabled(false).
                     password(passwordEncoder.encode(request.getPassword())).accountLocked(false).roles(List.of(userRole)).build() ;
         userRepositary.save(user) ;
-        SendValidationEmail(user) ;
-
-    }
-
-    private void SendValidationEmail(User user ) throws MessagingException {
         var newToken  = generateAndSaveActivationCode(user) ;
-        emailservice.sendMail(user.getEmail(),user.getUsername(), EmailTemplateName.ACTIVATE_ACCOUNT, activationUrl,  newToken, "Account_Activated");
-        
+        return newToken ; 
+
     }
+
+   
 
     private String generateAndSaveActivationCode(User user) {
         String generatedToken = generateActivationCode(6) ;
@@ -93,7 +88,7 @@ public class AuthenticationService {
 
     }
 
-    public void activateAaccount(String token){
+    public void  activateAaccount(String token){
         
         Token savedToken = tokenRepositary.findByToken(token).orElseThrow(() -> new RuntimeException("Invalid token")) ;
         if(LocalDateTime.now().isAfter(savedToken.getExpiredAt())){

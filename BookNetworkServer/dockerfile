@@ -1,0 +1,34 @@
+FROM maven:3.9-amazoncorretto-17 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Runtime stage
+FROM amazoncorretto:17-al2023-jdk
+WORKDIR /app
+
+
+
+
+# Copy the built artifact from build stage
+COPY --from=build /app/target/*.jar app.jar
+
+
+ENV SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/booksocialnetworks
+ENV SPRING_DATASOURCE_USERNAME=username
+ENV SPRING_DATASOURCE_PASSWORD=password
+ENV SPRING_MAIL_HOST=mail-dev
+ENV SPRING_MAIL_PORT=1025
+ENV SERVER_PORT=8080
+ENV SPRING_THYMELEAF_PREFIX=classpath:/templates/
+ENV SPRING_THYMELEAF_SUFFIX=.html
+ENV SPRING_THYMELEAF_ENABLED=true
+ENV SERVER_CONTEXT_PATH=/api/v1
+
+
+
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

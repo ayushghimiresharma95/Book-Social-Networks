@@ -28,12 +28,12 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest request) throws MessagingException {
+    public ResponseEntity<String> register(@Valid @RequestBody RegistrationRequest request) throws MessagingException {
 
         log.info("Received registration request: {}", request);
-        service.register(request);
+        
 
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok(service.register(request));
     }
 
     @PostMapping("/login")

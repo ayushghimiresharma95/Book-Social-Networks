@@ -1,16 +1,16 @@
 services:
   postgres:
     container_name: postgree_container
-    image: postgres:latest  # Corrected the image name
+    image: postgres:latest
     environment:
-      POSTGRES_USER: username  # Corrected environment variable names
+      POSTGRES_USER: username
       POSTGRES_PASSWORD: password
       PGDATA: /var/lib/postgresql/data
-      POSTGRES_DB: bookSocialNetworks
+      POSTGRES_DB: booksocialnetworks
     volumes:
-      - postgres:/var/lib/postgresql/data  # Use the named volume here
+      - postgres:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
     networks:
       - spring-demo
     restart: unless-stopped 
@@ -23,6 +23,29 @@ services:
       - "1025:1025"
     networks:
       - spring-demo
+
+  book-service:
+    container_name: book-service
+    image: ayushghimire95/bookservices:v1.0.4
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/booksocialnetworks
+      - SPRING_DATASOURCE_USERNAME=username
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_MAIL_HOST=mail-dev
+      - SPRING_MAIL_PORT=1025
+      - SERVER_PORT=8080
+      - SPRING_THYMELEAF_PREFIX=classpath:/templates/
+      - SPRING_THYMELEAF_SUFFIX=.html
+      - SPRING_THYMELEAF_ENABLED=true
+      - SERVER_CONTEXT_PATH=/api/v1
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - mail-dev
+    networks:
+      - spring-demo
+    restart: unless-stopped
 
 networks:
   spring-demo:

@@ -1,81 +1,152 @@
-# Book-Social-Networks
 
-### Book Mangement 
--- user can create, update , adn delete
--- each Book has the attributes like Title, author ,genre, descriptions
--- Implement CRUD(create,read , update and delete) operation for both frontend and backend.
--- Users can archieve books they no longer want to share but want to keep records on.
+# **Book Social Network**  
 
-## Docker compose
--- we have create a docker-compose file for the maildev and for the postgressql
-  docker-compose up -d 
-And for the maildev we go to the 127.0.0.1:1025 
+A platform for managing and sharing books, where users can lend, borrow, review, and track books easily. This project integrates a comprehensive book management system with user authentication and secure borrowing processes.
 
+---
 
+## **Features**  
 
+### **Book Management**  
+- Users can create, update, delete, and manage books.  
+- Each book has attributes like:  
+  - **Title**  
+  - **Author**  
+  - **Genre**  
+  - **Description**  
+- Implemented **CRUD (Create, Read, Update, Delete)** operations for both the frontend and backend.  
+- Users can archive books they no longer wish to share but want to keep a record of.
 
-### URL
+### **Book Sharing**  
+- Users can mark books as available for sharing.  
+- View a list of all available books.  
+- Share a book with another user using the sharing functionality.  
 
-#### GET REQUESTS
+### **Book Borrowing**  
+- Borrow and return books with a robust tracking system.  
+- Track the status of books: **borrowed**, **archived**, or **available**.  
+- Prevent multiple users from borrowing the same book simultaneously.  
 
--- to get all the Books -  #### /api/v1/books
+### **Feedback System**  
+- Users can leave feedback on books if:  
+  - The book is **shareable** and **not archived**.  
+  - The user does **not own** the book.  
+- Retrieve feedback for specific books.  
 
--- to get all the owner books or the user books - #### /api/v1/books/owner
+### **User Authentication**  
+- User registration and login functionalities implemented.  
+- Backend authentication secured with **Spring Security**.  
+- JWT (JSON Web Token) integration for secure communication between the backend and frontend.
 
--- to checout a particular book - #### /api/v1/Books/{book-id}
+---
 
--- to get all the books that the user have borrowed - #### /api/v1/books/borrowed 
+## **API Endpoints**  
 
--- to get all the books that user have returned - #### /api/v1/book/returned
+### **GET Requests**  
+- **Get all books**: `/api/v1/books`  
+- **Get books owned by a user**: `/api/v1/books/owner`  
+- **Get details of a specific book**: `/api/v1/books/{book-id}`  
+- **Get books borrowed by the user**: `/api/v1/books/borrowed`  
+- **Get books returned by the user**: `/api/v1/books/returned`  
 
+### **POST Requests**  
+- **Save a book**: `/api/v1/books`  
 
-#### POST REQUESTS
+### **PATCH Requests**  
+- **Borrow a book**: `/api/v1/books/borrow/{book-id}`  
+- **Archive a book**: `/api/v1/books/archived/{book-id}`  
+- **Toggle book shareability**: `/api/v1/books/shareable/{book-id}`  
+- **Return a borrowed book**: `/api/v1/books/borrow/return/{book-id}`  
+- **Approve a returned book**: `/api/v1/books/borrow/approve/{book-id}`  
 
--- to save the book -  - /api/v1/books
+### **Feedback API**  
+- **Add feedback for a book**: `/api/v1/feedbacks` (POST)  
+- **Get feedback for a specific book**: `/api/v1/feedbacks/book/{book-id}` (GET)  
 
-#### PATCH REQUESTS
+---
 
--- to borrow the book - /api/v1//books/borrow/{book-id}
+## **System Architecture**  
 
--- to archived a book - /api/v1/books/archived/{book-id}
+### **Backend**  
+- Built with **Spring Boot**.  
+- Implements **Spring Security** for secure authentication.  
+- Uses **JWT** for session and token management.  
 
--- to change the books that a user want shared to unshareable and vice-versa - (patch) - /api/v1/books/shareable/{book-id}
+### **Frontend**  
+- Developed with **React** for dynamic and user-friendly UI interactions.  
 
--- to return a book that a user have borrowed - /api/v1/books/borrow/return/{book-id}
+---
 
--- to approved a book that another user have borrowed and want to return - /api/v1/books/borrow/approve/{book-id}
+## **Database and Deployment**  
 
+### **Database**  
+- Uses **PostgreSQL** as the database for storing books, users, and transactions.  
 
-### Book sharing 
--- Users can mark their book as book for available.
+### **Docker Compose**  
+- A `docker-compose.yml` file is included to run the application components.  
+- Commands:  
+  - Start the application:  
+    ```bash  
+    docker-compose up -d  
+    ```  
+  - Stop the application:  
+    ```bash  
+    docker-compose down  
+    ```  
+- **Note**: The `maildev` service was initially planned but has not been implemented in this project.  
 
--- Others can view the list of available books.
+---
 
--- Implement a functionality to share a book with another user. 
+## **Class Diagram**  
 
-### Book Borrowing 
--- users can borrow the books 
+Below is the class diagram of the application:  
 
--- Track the status of each books(borrowed, archived, and available)
+![Class Diagram](class-diagram.png)  
 
--- prevent a mechanism so that multiple users can not borrowing the same book 
+---
 
-### Feedback 
--- a book that is shareable and is not archived , but  user can give the feedback to that book , but the book is not owned by the user, only then a user can give the feedback  - /api/v1/feedbacks (post)
+## **How to Run the Project**  
 
--- to get the feedback of a book - (get) - /api/v1/feedbacks/book/{book-id}
+1. **Clone the Repository**:  
+   ```bash  
+   git clone <repository-url>  
+   cd <repository-folder>  
+   ```  
 
-### Users authenticate 
--- Implement a user registration and login functionality
+2. **Backend Setup**:  
+   - Navigate to the backend directory:  
+     ```bash  
+     cd backend  
+     ```  
+   - Build and run the Spring Boot application:  
+     ```bash  
+     mvn spring-boot:run  
+     ```  
 
--- use spring security for backend authentications 
+3. **Frontend Setup**:  
+   - Navigate to the frontend directory:  
+     ```bash  
+     cd frontend  
+     ```  
+   - Install dependencies and start the React application:  
+     ```bash  
+     npm install  
+     npm start  
+     ```  
 
--- Integrate JWT for secure token authentication between spring and react.
+4. **Run with Docker** (Optional):  
+   - Start all components using Docker Compose:  
+     ```bash  
+     docker-compose up -d  
+     ```  
 
+---
 
+## **Future Improvements**  
+- Implement the `maildev` service for testing email notifications.  
+- Add a recommendation system for books based on user feedback.  
+- Introduce analytics for tracking the most borrowed books.  
 
-## Class Diagram
-
-![screenshot](class-diagram.png)
+---
 
 

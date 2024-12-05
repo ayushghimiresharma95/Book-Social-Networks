@@ -142,10 +142,7 @@ Below is the class diagram of the application:
 
 ---
 
-## **Future Improvements**  
-- Implement the `maildev` service for testing email notifications.  
-- Add a recommendation system for books based on user feedback.  
-- Introduce analytics for tracking the most borrowed books.  
+
 
 ---
 

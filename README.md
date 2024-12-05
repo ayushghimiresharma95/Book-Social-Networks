@@ -36,7 +36,8 @@ A platform for managing and sharing books, where users can lend, borrow, review,
 ### **User Authentication**  
 - User registration and login functionalities implemented.  
 - Backend authentication secured with **Spring Security**.  
-- JWT (JSON Web Token) integration for secure communication between the backend and frontend.
+- JWT (JSON Web Token) integration for secure communication between the backend and frontend.  
+- Simulated email functionality for tasks like account verification and password reset: the system will return a **string** instead of sending an actual email.
 
 ---
 
@@ -93,7 +94,6 @@ A platform for managing and sharing books, where users can lend, borrow, review,
     ```bash  
     docker-compose down  
     ```  
-- **Note**: The `maildev` service was initially planned but has not been implemented in this project.  
 
 ---
 
@@ -123,16 +123,7 @@ Below is the class diagram of the application:
      mvn spring-boot:run  
      ```  
 
-3. **Frontend Setup**:  
-   - Navigate to the frontend directory:  
-     ```bash  
-     cd frontend  
-     ```  
-   - Install dependencies and start the React application:  
-     ```bash  
-     npm install  
-     npm start  
-     ```  
+   
 
 4. **Run with Docker** (Optional):  
    - Start all components using Docker Compose:  
@@ -140,10 +131,7 @@ Below is the class diagram of the application:
      docker-compose up -d  
      ```  
 
----
 
 
-
----
 
 
